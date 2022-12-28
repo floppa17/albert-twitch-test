@@ -5,30 +5,24 @@ from tabulate import tabulate
 import urllib.parse
  
 # VARIABLES
-server = "euw"
-players = [{"name": "Main","account": "V9 Altbert"},{"name": "Second","account": "Alberner Albert"},{"name": "Smurf","account":"Albert Number 1"}]
-printable_list = []
-
+name = "Main"
+summoner_name = "V9 Altbert"
 session = HTMLSession()
+
+summoner_name_encoded = urllib.parse.quote(summoner_name)
+page = 'https://euw.op.gg/summoner/userName=' + summoner_name_encoded
+html = session.get(page)
+soup = BeautifulSoup(html.content, 'html.parser')
  
-for name in players:
-    summoner_name = name["account"]
-    summoner_name_encoded = urllib.parse.quote(summoner_name)
-    page = 'https://' + server + '.op.gg/summoner/userName=' + summoner_name_encoded
-    html = session.get(page)
-    soup = BeautifulSoup(html.content, 'html.parser')
- 
-    rank = soup.find("div", {"class": "tier"}).text.strip()
-    lp = soup.find("div", {"class": "lp"}).text.strip()
-    winrate = soup.find("div", {"class": "ratio"}).text.strip()
-    winlose = soup.find("div", {"class": "win-lose"}).text.strip()
-    wins, losses = winlose.split(" ")
+rank = soup.find("div", {"class": "tier"}).text.strip()
+lp = soup.find("div", {"class": "lp"}).text.strip()
+winrate = soup.find("div", {"class": "ratio"}).text.strip()
+wins, losses = soup.find("div", {"class": "win-lose"}).text.strip().split(" ")
+lastupdate = soup.find("div", {"class": "last-update"}).text.strip().partition("Last updated: ")[2]
     
-    printable_list.append({"pos": 0, "player": name["name"] ,"name": name["account"], "rank":rank, "lp":lp, "winrate": winrate, "wins": wins, "losses":losses})
- 
-pos = 1
-for entry in printable_list:
-    entry["pos"] = pos
-    pos += 1
- 
-print(tabulate(printable_list, headers={"pos": "Pos", "player": "Account", "name": "Name", "rank": "Rank", "lp": "LP", "winrate": "Winrate", "wins":"Wins", "losses":"Losses"}))
+
+
+def opgg():
+    return(""+summoner_name+" ist stuck in "+rank+", "+lp+", "+wins+" "+losses+", "+winrate+" ("+lastupdate+")")
+
+print(opgg())
