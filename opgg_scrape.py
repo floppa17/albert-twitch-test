@@ -1,19 +1,10 @@
-import functools
-from requests_html import HTMLSession
+from flask import Flask, request
 from bs4 import BeautifulSoup
-from tabulate import tabulate
 import urllib.parse
- 
-def main():
-    result = opgg()
-    return result
 
+app = Flask(__name__)
 
-# VARIABLES
-
-    
-
-
+@app.route('/', methods=['GET'])
 def opgg():
     name = "Main"
     summoner_name = "V9 Altbert"
@@ -30,3 +21,6 @@ def opgg():
     wins, losses = soup.find("div", {"class": "win-lose"}).text.strip().split(" ")
     lastupdate = soup.find("div", {"class": "last-update"}).text.strip().partition("Last updated: ")[2]
     return(""+summoner_name+" ist stuck in "+rank+", "+lp+", "+wins+" "+losses+", "+winrate+" ("+lastupdate+")")
+
+if __name__ == '__main__':
+    app.run()
