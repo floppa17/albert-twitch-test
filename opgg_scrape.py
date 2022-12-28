@@ -22,7 +22,7 @@ lastupdate = soup.find("div", {"class": "last-update"}).text.strip().partition("
     
 
 
-def opgg():
+def main():
     return(""+summoner_name+" ist stuck in "+rank+", "+lp+", "+wins+" "+losses+", "+winrate+" ("+lastupdate+")")
 
 print(opgg())
