@@ -1,11 +1,11 @@
 import uvloop
 import aiohttp
 import asyncio
-from fastapi import FastAPI
+from fastapi import FastAPI, Path
 from bs4 import BeautifulSoup
 import urllib.parse
 import time
-
+from fastapi.responses import PlainTextResponse
 
 app = FastAPI()
 
@@ -45,24 +45,23 @@ async def lookup(acc):
     page = 'https://euw.op.gg/summoner/userName=' + summoner_name_encoded
     html = await get_page_cached(page)
     data = parse_html(html)
-    return f"[ {summoner_name} | {data['rank']} {data['lp']} | {data['winrate']} ] "
+    return f"[ {summoner_name} | {data['rank']} {data['lp']} | {data['winrate']} ]"
 
-@app.get("/")
-async def opgg(summoner_name: str = None):
-    if summoner_name is None or summoner_name == '' or summoner_name == "''":
-        tasks = [
-            asyncio.create_task(lookup("V9 Altbert")),
-            asyncio.create_task(lookup("Alberner Albert")),
-            asyncio.create_task(lookup("Albert Number 1"))
-        ]
-        results = await asyncio.gather(*tasks)
-        return "\n".join(results)
 
+
+@app.get("/summoner/{summoner_name}", response_class=PlainTextResponse)
+async def opgg(summoner_name: str = Path(None, title="Summoner name of player")):
+  if summoner_name == "''":
+    tasks = [asyncio.create_task(lookup("V9 Altbert")),asyncio.create_task(lookup("Alberner Albert")),asyncio.create_task(lookup("Albert Number 1"))]
+    results = await asyncio.gather(*tasks)
+    return " ".join(results)
+  else:
     summoner_name_encoded = urllib.parse.quote(summoner_name)
     page = 'https://euw.op.gg/summoner/userName=' + summoner_name_encoded
     html = await get_page(page)
     data = parse_html(html)
-    return f"{summoner_name} is stuck in {data['rank']}, {data['lp']}, {data['winrate']}"
+    return f"{summoner_name} ist stuck in {data['rank']}, {data['lp']}, {data['winrate']}"
+  return("Error")
 
 if __name__ == "__main__":
     import uvicorn
