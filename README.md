@@ -3,6 +3,10 @@
 
 My first experience with Python web developement
 
+## Usage
+!opgg
+@$(user) $(urlfetch https://FastAPI-opgg-fetcher.leon16c.repl.co/summoner/'$(querystring)')
+
 
 ## Optimizations
 
